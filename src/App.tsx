@@ -1,26 +1,16 @@
 import React from 'react';
 import logo from './logo.svg';
-import './App.css';
+import "./App.css"
+import { PageHeader, Button, Descriptions } from 'antd';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => <PageHeader
+  ghost={false}
+  title="Get data"
+  extra={[
+    <Button key="1" type="primary">
+      Fetch
+  </Button>,
+  ]}
+></PageHeader>
 
 export default App;
