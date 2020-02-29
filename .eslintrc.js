@@ -9,19 +9,20 @@ module.exports = {
     "prettier",
     "prettier/react",
     "prettier/@typescript-eslint",
+    "airbnb-typescript"
   ],
-  "parser": "babel-eslint",
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaFeatures": {
-      "classes": true,
-      "impliedStrict": true
-    },
-    "ecmaVersion": 2020
+    "project": "./tsconfig.json",
   },
   "plugins": [
-    "prettier"
+    "prettier",
+    "react-hooks"
   ],
   "rules": {
+    "@typescript-eslint/semi": ["off"],
+    "semi": "off",
+    "react/jsx-filename-extension": [0],
     "arrow-body-style": 0,
     "comma-dangle": 0,
     "consistent-return": 0,
@@ -117,15 +118,6 @@ module.exports = {
     "react/destructuring-assignment": 0,
     "react/display-name": 1,
     "react/forbid-prop-types": 0,
-    "react/jsx-filename-extension": [
-      1,
-      {
-        "extensions": [
-          ".js",
-          ".jsx"
-        ]
-      }
-    ],
     "react/no-array-index-key": 0,
     "react/no-multi-comp": 0,
     "react/no-unescaped-entities": 0,
