@@ -38,10 +38,10 @@ export const fetchMachine = Machine<
         },
       },
       pending: {
-        entry: ['fetchData'],
-        on: {
-          RESOLVE: { target: 'successful', actions: ['setResults'] },
-          REJECT: { target: 'failed', actions: ['setMessage'] },
+        invoke: {
+          src: 'fetchData',
+          onDone: { target: 'successful', actions: ['setResults'] },
+          onError: { target: 'failed', actions: ['setMessage'] },
         },
       },
       failed: {
@@ -57,10 +57,10 @@ export const fetchMachine = Machine<
   {
     actions: {
       setResults: assign((ctx, event: any) => ({
-        results: event.results,
+        results: event.data,
       })),
       setMessage: assign((ctx, event: any) => ({
-        errorMessage: event.message,
+        errorMessage: event.data,
       })),
     },
   }

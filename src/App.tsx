@@ -3,46 +3,80 @@ import React from 'react'
 import './App.css'
 import { PageHeader, Button } from 'antd'
 import { useMachine } from '@xstate/react'
-import { fetchPeople } from './api'
+import { fetchPeople, fetchPlanets } from './api'
 import { fetchMachine } from './machines/fetch'
 
 const App = () => {
-  const [fetchState, sendToFetchMacnine] = useMachine(fetchMachine, {
-    actions: {
+  const [fetchPeopleState, sendToPeopleMachine] = useMachine(fetchMachine, {
+    services: {
       fetchData: async (ctx, event) => {
-        try {
-          const r = await fetchPeople()
-          sendToFetchMacnine({ type: 'RESOLVE', results: r.results })
-        } catch (message) {
-          sendToFetchMacnine({ type: 'REJECT', message })
-        }
+        const r = await fetchPeople()
+        return r.results
+      },
+    },
+  })
+  const [fetchPlanetState, sendToPlanetMachine] = useMachine(fetchMachine, {
+    services: {
+      fetchData: async (ctx, event) => {
+        const r = await fetchPlanets()
+        return r.results
       },
     },
   })
   return (
     <div>
-      <PageHeader
-        title="Get data"
-        extra={[
-          <Button
-            key="1"
-            type="primary"
-            onClick={() => sendToFetchMacnine({ type: 'FETCH' })}
-          >
-            Fetch
-          </Button>,
-        ]}
-      />
-      {fetchState.matches('pending') ? <p>Loading</p> : null}
-      {fetchState.matches('successful') ? (
-        <ul>
-          {fetchState.context.results &&
-            fetchState.context.results.map((person, index) => (
-              <li key={index}>{person.name}</li>
-            ))}
-        </ul>
-      ) : null}
-      {fetchState.matches('failed') ? fetchState.context.errorMessage : null}
+      <div>
+        <PageHeader
+          title="Planets"
+          extra={[
+            <Button
+              key="1"
+              type="primary"
+              onClick={() => sendToPlanetMachine({ type: 'FETCH' })}
+            >
+              Fetch planets
+            </Button>,
+          ]}
+        />
+        {fetchPlanetState.matches('pending') ? <p>Loading</p> : null}
+        {fetchPlanetState.matches('successful') ? (
+          <ul>
+            {fetchPlanetState.context.results &&
+              fetchPlanetState.context.results.map((person, index) => (
+                <li key={index}>{person.name}</li>
+              ))}
+          </ul>
+        ) : null}
+        {fetchPlanetState.matches('failed')
+          ? fetchPlanetState.context.errorMessage
+          : null}
+      </div>
+      <div>
+        <PageHeader
+          title="Get peoples"
+          extra={[
+            <Button
+              key="1"
+              type="primary"
+              onClick={() => sendToPeopleMachine({ type: 'FETCH' })}
+            >
+              Fetch peoples
+            </Button>,
+          ]}
+        />
+        {fetchPeopleState.matches('pending') ? <p>Loading</p> : null}
+        {fetchPeopleState.matches('successful') ? (
+          <ul>
+            {fetchPeopleState.context.results &&
+              fetchPeopleState.context.results.map((person, index) => (
+                <li key={index}>{person.name}</li>
+              ))}
+          </ul>
+        ) : null}
+        {fetchPeopleState.matches('failed')
+          ? fetchPeopleState.context.errorMessage
+          : null}
+      </div>
     </div>
   )
 }
