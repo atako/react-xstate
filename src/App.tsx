@@ -5,8 +5,17 @@ import { PageHeader, Button } from 'antd'
 import { useMachine } from '@xstate/react'
 import { fetchPeople, fetchPlanets } from './api'
 import { fetchMachine } from './machines/fetch'
+import { matchingMachine } from './machines/matching'
 
 const App = () => {
+  const [matchingState, sendToMatchMachine] = useMachine(matchingMachine, {
+    guards: {
+      isCorrect: ctx => {
+        return ctx.topSelectedItem.homeworld === ctx.bottomSelectedItem.url
+      },
+    },
+  })
+  console.log(matchingState.value)
   const [fetchPeopleState, sendToPeopleMachine] = useMachine(fetchMachine, {
     services: {
       fetchData: async (ctx, event) => {
@@ -19,7 +28,6 @@ const App = () => {
     services: {
       fetchData: async (ctx, event) => {
         const r = await fetchPlanets()
-        console.log('R:', r)
         return r.results
       },
     },
@@ -43,8 +51,25 @@ const App = () => {
         {fetchPlanetState.matches('successful.withData') ? (
           <ul>
             {fetchPlanetState.context.results &&
-              fetchPlanetState.context.results.map((person, index) => (
-                <li key={index}>{person.name}</li>
+              fetchPlanetState.context.results.map((planet, index) => (
+                <li key={index}>
+                  <button
+                    style={{
+                      backgroundColor:
+                        matchingState.context.topSelectedItem === planet
+                          ? 'lightblue'
+                          : '',
+                    }}
+                    onClick={() =>
+                      sendToMatchMachine({
+                        type: 'SELECT_TOP',
+                        selectedItem: planet,
+                      })
+                    }
+                  >
+                    {planet.name}
+                  </button>
+                </li>
               ))}
           </ul>
         ) : null}
@@ -73,7 +98,24 @@ const App = () => {
           <ul>
             {fetchPeopleState.context.results &&
               fetchPeopleState.context.results.map((person, index) => (
-                <li key={index}>{person.name}</li>
+                <li key={index}>
+                  <button
+                    style={{
+                      backgroundColor:
+                        matchingState.context.bottomSelectedItem === person
+                          ? 'red'
+                          : '',
+                    }}
+                    onClick={() =>
+                      sendToMatchMachine({
+                        type: 'SELECT_BOTTOM',
+                        selectedItem: person,
+                      })
+                    }
+                  >
+                    {person.name}
+                  </button>
+                </li>
               ))}
           </ul>
         ) : null}
@@ -81,6 +123,8 @@ const App = () => {
           ? fetchPeopleState.context.errorMessage
           : null}
       </div>
+      {matchingState.matches('submitted.correct') ? <p>Correct</p> : null}
+      {matchingState.matches('submitted.incorrect') ? <p>Incorrect</p> : null}
     </div>
   )
 }

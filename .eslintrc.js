@@ -127,6 +127,7 @@ module.exports = {
     "react/require-default-props": 0,
     "space-before-function-paren": 0,
     "indent": "off",
-    "@typescript-eslint/indent": ["off", 2]
+    "@typescript-eslint/indent": ["off", 2],
+    "arrow-parens": 0
   }
 }
