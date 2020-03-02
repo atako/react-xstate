@@ -4,7 +4,13 @@ interface FetchStates {
   states: {
     idle: {}
     pending: {}
-    successful: {}
+    successful: {
+      states: {
+        unknown: {}
+        withData: {}
+        withoutData: {}
+      }
+    }
     failed: {}
   }
 }
@@ -40,17 +46,37 @@ export const fetchMachine = Machine<
       pending: {
         invoke: {
           src: 'fetchData',
-          onDone: { target: 'successful', actions: ['setResults'] },
-          onError: { target: 'failed', actions: ['setMessage'] },
+          onDone: { target: 'successful' },
+          onError: { target: 'failed' },
         },
       },
       failed: {
+        entry: ['setMessage'],
         on: {
           FETCH: 'pending',
         },
       },
       successful: {
+        entry: ['setResults'],
+        initial: 'unknown',
         on: { FETCH: 'pending' },
+        states: {
+          unknown: {
+            on: {
+              '': [
+                {
+                  target: 'withData',
+                  cond: 'hasData',
+                },
+                {
+                  target: 'withoutData',
+                },
+              ],
+            },
+          },
+          withData: {},
+          withoutData: {},
+        },
       },
     },
   },
@@ -62,6 +88,11 @@ export const fetchMachine = Machine<
       setMessage: assign((ctx, event: any) => ({
         errorMessage: event.data,
       })),
+    },
+    guards: {
+      hasData: (ctx, event: any) => {
+        return ctx.results && ctx.results.length > 0
+      },
     },
   }
 )

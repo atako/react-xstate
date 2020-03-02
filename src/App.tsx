@@ -19,6 +19,7 @@ const App = () => {
     services: {
       fetchData: async (ctx, event) => {
         const r = await fetchPlanets()
+        console.log('R:', r)
         return r.results
       },
     },
@@ -39,13 +40,16 @@ const App = () => {
           ]}
         />
         {fetchPlanetState.matches('pending') ? <p>Loading</p> : null}
-        {fetchPlanetState.matches('successful') ? (
+        {fetchPlanetState.matches('successful.withData') ? (
           <ul>
             {fetchPlanetState.context.results &&
               fetchPlanetState.context.results.map((person, index) => (
                 <li key={index}>{person.name}</li>
               ))}
           </ul>
+        ) : null}
+        {fetchPlanetState.matches('successful.withoutData') ? (
+          <p>No results</p>
         ) : null}
         {fetchPlanetState.matches('failed')
           ? fetchPlanetState.context.errorMessage
